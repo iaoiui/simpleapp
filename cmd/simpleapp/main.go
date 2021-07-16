@@ -7,6 +7,7 @@ import (
 	"github.com/joho/godotenv"
 	"log"
 	"os"
+	"path/filepath"
 	"strconv"
 )
 
@@ -16,7 +17,14 @@ func main() {
 
 // LoadDotEnv Load .env file
 func LoadDotEnv() {
-	err := godotenv.Load()
+	cwd, err := os.Getwd()
+
+	if err != nil {
+		log.Fatal("Error getting current working directory")
+	}
+	fmt.Println(filepath.Join(cwd, ".env"))
+	err = godotenv.Load(filepath.Join(cwd, ".env"))
+
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}

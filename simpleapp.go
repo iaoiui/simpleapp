@@ -14,10 +14,6 @@ import (
 	"path/filepath"
 )
 
-func Run() {
-	fmt.Println("Hello SimpleApp")
-}
-
 type CSV struct {
 	records [][]string
 }
@@ -40,7 +36,6 @@ func ReadCSV(filepath string) (CSV, error) {
 	if err != nil {
 		return CSV{}, errors.New("cannot read csv file")
 	}
-	//fmt.Println(records[1:])
 	return CSV{records}, nil
 }
 
@@ -56,10 +51,6 @@ func ExampleReadCSV() {
 	}
 	fmt.Println(csv.Records()[1:])
 	// Output: [[Alice 28] [Bob 29]]
-}
-
-func WriteCSV(content string, fileName string) {
-
 }
 
 // Env read environment variables
@@ -118,7 +109,6 @@ func ListBuckets() {
 		fmt.Errorf(err.Error())
 	}
 
-	//simpleapp.GetS3Object("hey-tono", "macbook.jpg", "testfile.jpg")
 	svc := s3.New(sess)
 	result, _ := svc.ListBuckets(nil)
 	fmt.Println("Buckets:")
