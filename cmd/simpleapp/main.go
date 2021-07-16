@@ -6,6 +6,7 @@ import (
 	"github.com/iaoiui/simpleapp"
 	"github.com/joho/godotenv"
 	"log"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -16,7 +17,7 @@ func main() {
 }
 
 // LoadDotEnv Load .env file
-func LoadDotEnv() {
+func loadDotEnv() {
 	cwd, err := os.Getwd()
 
 	if err != nil {
@@ -30,22 +31,22 @@ func LoadDotEnv() {
 	}
 }
 
-func CheckDebugMode() error {
+func isDebug() (bool, error) {
 	var debug bool = false
 	if simpleapp.Env("DEBUG") != "" {
 		var err error
 		debug, err = strconv.ParseBool(simpleapp.Env("DEBUG"))
 		if err != nil {
-			return errors.New("DEBUG env is not bool")
+			return debug, errors.New("DEBUG env is not bool")
 		}
 	}
 
-	fmt.Println("debug mode is ", debug)
-	return nil
+	//fmt.Println("debug mode is ", debug)
+	return debug, nil
 }
 
-func ExampleCheckDebugMode() {
-	if err := CheckDebugMode(); err != nil {
+func exampleCheckDebugMode() {
+	if _, err := isDebug(); err != nil {
 		fmt.Errorf("cannot check debug mode")
 	}
 	// Output: debug mode is  true
@@ -53,7 +54,24 @@ func ExampleCheckDebugMode() {
 
 func Run() int {
 
-	LoadDotEnv()
-
+	loadDotEnv()
+	runWebServer()
 	return 0
+}
+
+func handler(w http.ResponseWriter, r *http.Request) {
+	text := "Hello, World\n"
+	fmt.Fprintf(w, text)
+
+	debug, err := isDebug()
+	if err != nil {
+		fmt.Errorf("%v", err)
+	}
+	if debug {
+		fmt.Fprintf(w, "debug mode\n")
+	}
+}
+func runWebServer() {
+	http.HandleFunc("/", handler) // ハンドラを登録してウェブページを表示させる
+	http.ListenAndServe(":8080", nil)
 }
