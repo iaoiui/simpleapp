@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"github.com/iaoiui/simpleapp"
 	"github.com/joho/godotenv"
@@ -21,21 +22,30 @@ func LoadDotEnv() {
 	}
 }
 
-func Run() int {
-	debug := false
-	var err error
-	LoadDotEnv()
-
+func CheckDebugMode() error {
+	var debug bool = false
 	if simpleapp.Env("DEBUG") != "" {
+		var err error
 		debug, err = strconv.ParseBool(simpleapp.Env("DEBUG"))
 		if err != nil {
-			fmt.Errorf("DEBUG env is not bool")
-			return 1
+			return errors.New("DEBUG env is not bool")
 		}
 	}
 
 	fmt.Println("debug mode is ", debug)
-	//if (DEBUG)
+	return nil
+}
+
+func ExampleCheckDebugMode() {
+	if err := CheckDebugMode(); err != nil {
+		fmt.Errorf("cannot check debug mode")
+	}
+	// Output: debug mode is  true
+}
+
+func Run() int {
+
+	LoadDotEnv()
 
 	return 0
 }

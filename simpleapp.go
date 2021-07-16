@@ -4,6 +4,10 @@ import (
 	"encoding/csv"
 	"errors"
 	"fmt"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"log"
 	"os"
 	"os/user"
@@ -67,4 +71,59 @@ func Env(key string) string {
 func ExampleEnv() {
 	debug := Env("DEBUG")
 	fmt.Println("debug mode is ", debug)
+}
+
+func GetS3Object(bucket, item string) error {
+
+	sess := session.Must(session.NewSessionWithOptions(session.Options{
+		SharedConfigState: session.SharedConfigEnable,
+	}))
+	_, err := sess.Config.Credentials.Get()
+	if err != nil {
+		fmt.Errorf(err.Error())
+	}
+
+	file, err := os.Create(item)
+	if err != nil {
+		fmt.Errorf(err.Error())
+	}
+
+	defer file.Close()
+
+	downloader := s3manager.NewDownloader(sess)
+	_, err = downloader.Download(file,
+		&s3.GetObjectInput{
+			Bucket: aws.String(bucket),
+			Key:    aws.String(item),
+		})
+	return nil
+}
+
+func ExampleGetS3Object() {
+
+	bucket := Env("BUCKET")
+	item := Env("ITEM")
+
+	fmt.Println(bucket, item)
+
+	GetS3Object(bucket, item)
+}
+
+func ListBuckets() {
+	sess := session.Must(session.NewSessionWithOptions(session.Options{
+		SharedConfigState: session.SharedConfigEnable,
+	}))
+	_, err := sess.Config.Credentials.Get()
+	if err != nil {
+		fmt.Errorf(err.Error())
+	}
+
+	//simpleapp.GetS3Object("hey-tono", "macbook.jpg", "testfile.jpg")
+	svc := s3.New(sess)
+	result, _ := svc.ListBuckets(nil)
+	fmt.Println("Buckets:")
+
+	for _, b := range result.Buckets {
+		fmt.Printf("* %s created on %s\n", aws.StringValue(b.Name), aws.TimeValue(b.CreationDate))
+	}
 }
