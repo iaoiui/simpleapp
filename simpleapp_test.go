@@ -2,9 +2,11 @@ package simpleapp
 
 import (
 	"log"
+	"os"
 	"os/user"
 	"path/filepath"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -44,5 +46,13 @@ func TestReadCSV(t *testing.T) {
 				t.Errorf("ReadCSV() = %v, want %v", got, tt.want)
 			}
 		})
+	}
+}
+
+func TestEnv(t *testing.T) {
+	os.Setenv("TEST", "test")
+	value := Env("TEST")
+	if !strings.Contains(value, "test") {
+		t.Errorf("expected: %s, actual: %s", "test", value)
 	}
 }
