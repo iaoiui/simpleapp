@@ -117,3 +117,33 @@ func ListBuckets() {
 		fmt.Printf("* %s created on %s\n", aws.StringValue(b.Name), aws.TimeValue(b.CreationDate))
 	}
 }
+
+type Human interface {
+	Hello()
+}
+
+type Supervisor struct {
+	Name string
+}
+
+type Manager struct {
+	Name string
+}
+
+func (s Supervisor) Hello() {
+	fmt.Println("Hello ", s.Name)
+}
+
+func (m Manager) Hello() {
+	fmt.Println("Yo ", m.Name)
+}
+func sayHello(h Human) {
+	h.Hello()
+}
+func ExampleHello() {
+	hoge := Supervisor{Name: "hoge"}
+	fuga := Manager{Name: "fuga"}
+	for _, human := range []Human{hoge, fuga} {
+		sayHello(human)
+	}
+}
