@@ -55,9 +55,7 @@ func exampleCheckDebugMode() {
 func Run() int {
 	//
 	//loadDotEnv()
-	//runWebServer()
-
-	simpleapp.ExampleHello()
+	runWebServer()
 
 	return 0
 }

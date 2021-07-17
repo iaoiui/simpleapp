@@ -2,12 +2,14 @@ package simpleapp
 
 import (
 	"encoding/csv"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
+	"io/ioutil"
 	"log"
 	"os"
 	"os/user"
@@ -25,6 +27,7 @@ func (c *CSV) Records() [][]string {
 // ReadCSV read specified csv file
 func ReadCSV(filepath string) (CSV, error) {
 	f, err := os.Open(filepath)
+	defer f.Close()
 	if err != nil {
 		//fmt.Errorf("cannot open file")
 		return CSV{}, errors.New("cannot open file")
@@ -146,4 +149,39 @@ func ExampleHello() {
 	for _, human := range []Human{hoge, fuga} {
 		sayHello(human)
 	}
+}
+
+//JSON
+
+type Config struct {
+	User  string   `json:"user"`
+	Items []string `json:"items"`
+}
+
+func ReadConfigFromJSON(filepath string) {
+	f, err := os.Open(filepath)
+	defer f.Close()
+	if err != nil {
+		fmt.Errorf("cannot open file")
+	}
+	byteValue, _ := ioutil.ReadAll(f)
+	var config Config
+	json.Unmarshal(byteValue, &config)
+
+	fmt.Println(string(byteValue))
+
+}
+
+func DealJSON() {
+
+	conf := &Config{
+		User:  "hoge",
+		Items: []string{"apple", "peach", "pear"}}
+	confJson, _ := json.Marshal(conf)
+	fmt.Println(string(confJson))
+}
+
+func ExmapleDealJSON() {
+	DealJSON()
+	// Output: {"user":"hoge","items":["apple","peach","pear"]}
 }
