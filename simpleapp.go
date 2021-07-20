@@ -57,13 +57,22 @@ func ExampleReadCSV() {
 }
 
 // Env read environment variables
-func Env(key string) string {
-	value := os.Getenv(key)
-	return value
+func Env(key, defaultValue string) string {
+	if value, ok := os.LookupEnv(key); ok {
+		return value
+	}
+	return defaultValue
+}
+
+func getEnv(key, fallback string) string {
+	if value, ok := os.LookupEnv(key); ok {
+		return value
+	}
+	return fallback
 }
 
 func ExampleEnv() {
-	debug := Env("DEBUG")
+	debug := Env("DEBUG", "false")
 	fmt.Println("debug mode is ", debug)
 }
 
@@ -95,8 +104,8 @@ func GetS3Object(bucket, item string) error {
 
 func ExampleGetS3Object() {
 
-	bucket := Env("BUCKET")
-	item := Env("ITEM")
+	bucket := Env("BUCKET", "")
+	item := Env("ITEM", "")
 
 	fmt.Println(bucket, item)
 
